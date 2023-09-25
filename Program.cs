@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-
-public class SomeData
+﻿public class SomeData
 {
     public Double SomeDouble { get; set; }
     public Int64 SomeInt { get; set; }
@@ -12,48 +9,64 @@ public class JsonHack
     public List<SomeData> SomeDatas { get; set; } = new List<SomeData>(); 
 }
 
+public class SampleData
+{
+    public List<Double> Answers { get; set; } = new List<Double>();
+    public string Json { get; set; } = "";
+    public Int32 Count;
+}
+
 internal class Program
 {
-    private static void Main(string[] args)
+    private static SampleData GenerateSampleData(Int32 count)
     {
-        Random random = new Random();
-        StringBuilder stringBuilder = new StringBuilder();
+        SampleData result = new SampleData
+        {
+            Count = count,
+        };
+
+        Random random = new();
+        System.Text.StringBuilder stringBuilder = new();
 
         stringBuilder.AppendLine("{");
         stringBuilder.AppendLine("\t\"someDatas\": [");
 
-        List<Double> answers = new List<double>();
         Double total = 0.0d;
-        Int32 count = 10;
         for(UInt32 index = 0; index < count; ++index)
         {
             Double someDouble = random.NextDouble();
             Int64 someInt = random.NextInt64();
             Double answer = someDouble*Math.Sqrt(someInt);
-            answers.Add(answer);
+            result.Answers.Add(answer);
             total += answer;
 
             stringBuilder.Append($"\t\t{{ \"someDouble\": {someDouble}, \"someInt\": {someInt} }}");
             stringBuilder.AppendLine((index == (count - 1)) ? "" : ",");
         }
-        answers.Add(total);
+        result.Answers.Add(total);
 
         stringBuilder.AppendLine("\t]");
         stringBuilder.AppendLine("}");
 
-        string json = stringBuilder.ToString();
+        result.Json= stringBuilder.ToString();
 
-        JsonHack? parsedJson = JsonSerializer.Deserialize<JsonHack>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        return result;
+    }
+
+    public static bool ValidateSampleData(SampleData sampleData, JsonHack? parsedJson)
+    {
+        bool result = false;
+
         if(parsedJson != null)
         {
             Double sum = 0;
-            for(Int32 index = 0; index < count; ++index)
+            for(Int32 index = 0; index < sampleData.Count; ++index)
             {
                 if(index < parsedJson.SomeDatas.Count)
                 {
                     SomeData someData = parsedJson.SomeDatas[index];
                     Double expected = someData.SomeDouble*Math.Sqrt(someData.SomeInt);
-                    Double actual = answers[index];
+                    Double actual = sampleData.Answers[index];
                     sum += expected;
                     if(expected != actual)
                     {
@@ -68,14 +81,33 @@ internal class Program
                 }
             }
 
-            if(sum != answers[count])
+            if(sum != sampleData.Answers[sampleData.Count])
             {
-                Console.WriteLine($"Error: total mismatch on, expected: {sum}, actual: {answers[count]}");
+                Console.WriteLine($"Error: total mismatch on, expected: {sum}, actual: {sampleData.Answers[sampleData.Count]}");
+            }
+            else
+            {
+                result = true;
             }
         }
         else
         {
             Console.WriteLine("Error: failed to parse json");
         }
+
+        return result;
+    }
+
+    private static void Main(string[] args)
+    {
+        SampleData sampleData = GenerateSampleData(10);
+        
+        System.Text.Json.JsonSerializerOptions serializerOptions = new(){ PropertyNameCaseInsensitive = true };
+        JsonHack? parsedJson = System.Text.Json.JsonSerializer.Deserialize<JsonHack>(sampleData.Json, serializerOptions);
+        if(ValidateSampleData(sampleData, parsedJson))
+        {
+            Console.WriteLine($"System.Text.Json valid");
+        }
+
     }
 }
