@@ -2,11 +2,6 @@
 
 namespace DotNetPerformance;
 
-public class JsonHack
-{
-    public List<SomeData> SomeDatas { get; set; } = new List<SomeData>(); 
-}
-
 internal class Program
 {
     private static void Main(string[] args)
@@ -14,23 +9,23 @@ internal class Program
         Int64 startTime = Stopwatch.GetTimestamp();
 
         SampleData sampleData = SampleDataGenerator.Generate(100);
-        
-        {
-            System.Text.Json.JsonSerializerOptions serializerOptions = new(){ PropertyNameCaseInsensitive = true };
-            JsonHack? parsedJson = System.Text.Json.JsonSerializer.Deserialize<JsonHack>(sampleData.Json, serializerOptions);
-            if((parsedJson == null) || 
-               !sampleData.Validate(parsedJson.SomeDatas))
-            {
-                Console.WriteLine($"Error: System.Text.Json invalid");
-            }
-        }
 
+        ISomeDataParser[] parsers = new ISomeDataParser[]
         {
-            JsonHack? parsedJson = Newtonsoft.Json.JsonConvert.DeserializeObject<JsonHack>(sampleData.Json);
-            if((parsedJson == null) ||
-               !sampleData.Validate(parsedJson.SomeDatas))
+            new MicrosoftJsonParser(),
+            new NewtonsoftJsonParser()
+        };
+
+        foreach(ISomeDataParser parser in parsers)
+        {
+            List<SomeData> someDatas = parser.ParseJson(sampleData.Json);
+            if(!sampleData.Validate(someDatas))
             {
-                Console.WriteLine($"Error: Newtonsoft.Json invalid");
+                Console.WriteLine($"Error: {parser.Label} is invalid");
+            }
+            else
+            {
+                Console.WriteLine($"{parser.Label} is valid");
             }
         }
 
