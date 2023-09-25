@@ -102,12 +102,21 @@ internal class Program
     {
         SampleData sampleData = GenerateSampleData(10);
         
-        System.Text.Json.JsonSerializerOptions serializerOptions = new(){ PropertyNameCaseInsensitive = true };
-        JsonHack? parsedJson = System.Text.Json.JsonSerializer.Deserialize<JsonHack>(sampleData.Json, serializerOptions);
-        if(ValidateSampleData(sampleData, parsedJson))
         {
-            Console.WriteLine($"System.Text.Json valid");
+            System.Text.Json.JsonSerializerOptions serializerOptions = new(){ PropertyNameCaseInsensitive = true };
+            JsonHack? parsedJson = System.Text.Json.JsonSerializer.Deserialize<JsonHack>(sampleData.Json, serializerOptions);
+            if(ValidateSampleData(sampleData, parsedJson))
+            {
+                Console.WriteLine($"System.Text.Json valid");
+            }
         }
 
+        {
+            JsonHack? parsedJson = Newtonsoft.Json.JsonConvert.DeserializeObject<JsonHack>(sampleData.Json);
+            if(ValidateSampleData(sampleData, parsedJson))
+            {
+                Console.WriteLine($"Newtonsoft.Json valid");
+            }
+        }
     }
 }
