@@ -1,4 +1,6 @@
-﻿public class SomeData
+﻿using System.Diagnostics;
+
+public class SomeData
 {
     public Double SomeDouble { get; set; }
     public Int64 SomeInt { get; set; }
@@ -100,7 +102,9 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        SampleData sampleData = GenerateSampleData(10);
+        Int64 startTime = Stopwatch.GetTimestamp();
+
+        SampleData sampleData = GenerateSampleData(100);
         
         {
             System.Text.Json.JsonSerializerOptions serializerOptions = new(){ PropertyNameCaseInsensitive = true };
@@ -118,5 +122,10 @@ internal class Program
                 Console.WriteLine($"Newtonsoft.Json valid");
             }
         }
+
+        Int64 endTime = Stopwatch.GetTimestamp();
+        Int64 elapsedTime = endTime - startTime;
+        Double seconds = (Double)elapsedTime/(Double)Stopwatch.Frequency;
+        Console.WriteLine($"Total {seconds*1000.0d:F2}ms");
     }
 }
