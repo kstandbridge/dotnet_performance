@@ -30,12 +30,14 @@ internal class Program
             {
                 Console.Write($"\n--- {parser.Label} ---\n");
                 Profiler profiler = new Profiler();
-                profiler.NewTestWave(1);
+                profiler.NewTestWave(sampleData.Json.Length, 1);
                 while(profiler.IsTesting())
                 {
                     profiler.Begin();
                     parser.ParseJson(sampleData.Json);
                     profiler.End();
+
+                    profiler.CountBytes(sampleData.Json.Length);
                 }
             }
         }
