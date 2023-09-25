@@ -1,14 +1,10 @@
-﻿using System.Diagnostics;
-
-namespace DotNetPerformance;
+﻿namespace DotNetPerformance;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        Int64 startTime = Stopwatch.GetTimestamp();
-
-        SampleData sampleData = SampleDataGenerator.Generate(100);
+        SampleData sampleData = SampleDataGenerator.Generate(1000);
 
         ISomeDataParser[] parsers = new ISomeDataParser[]
         {
@@ -16,22 +12,34 @@ internal class Program
             new NewtonsoftJsonParser()
         };
 
+        bool AreParsersValid = true;
         foreach(ISomeDataParser parser in parsers)
         {
             List<SomeData> someDatas = parser.ParseJson(sampleData.Json);
             if(!sampleData.Validate(someDatas))
             {
                 Console.WriteLine($"Error: {parser.Label} is invalid");
-            }
-            else
-            {
-                Console.WriteLine($"{parser.Label} is valid");
+                AreParsersValid = false;
+                break;
             }
         }
 
-        Int64 endTime = Stopwatch.GetTimestamp();
-        Int64 elapsedTime = endTime - startTime;
-        Double seconds = (Double)elapsedTime/(Double)Stopwatch.Frequency;
-        Console.WriteLine($"Total {seconds*1000.0d:F2}ms");
+        if(AreParsersValid == true)
+        {
+            foreach(ISomeDataParser parser in parsers)
+            {
+                Console.Write($"\n--- {parser.Label} ---\n");
+                Profiler profiler = new Profiler();
+                profiler.NewTestWave(1);
+                while(profiler.IsTesting())
+                {
+                    profiler.Begin();
+                    parser.ParseJson(sampleData.Json);
+                    profiler.End();
+                }
+            }
+        }
+
+        Console.WriteLine("");
     }
 }
