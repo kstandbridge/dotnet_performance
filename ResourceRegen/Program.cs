@@ -29,8 +29,8 @@ internal class Program
 
         for(Int32 index = 0; index < count; ++index)
         {
-            UInt64 intellect = (UInt64)random.Next(500, 2500);
-            UInt64 spirit = (UInt64)random.Next(500, 2500);
+            UInt64 intellect = (UInt64)random.NextInt64(Int32.MaxValue, Int64.MaxValue);
+            UInt64 spirit = (UInt64)random.Next(Int16.MaxValue / 100, Int32.MaxValue / 100);
             PlayerClassType classType = (PlayerClassType)random.Next(0, (Int32)PlayerClassType.Count);
             switch (classType)
             {
@@ -100,7 +100,7 @@ internal class Program
         }
         dataPlayers.ClearResource();
 
-        Int32 ticksToTest = 1000;
+        Int32 ticksToTest = 1024;
         IPlayerTest[] playerTests = new IPlayerTest[]
         {
             // new DataPlayerTest(dataPlayers, ticksToTest, new Profiler()),
