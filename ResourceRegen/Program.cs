@@ -17,9 +17,9 @@ internal class Program
         Console.WriteLine("");
 
         Random random = new Random();
-        List<BasePlayer> basePlayers = new List<BasePlayer>();
-        List<MonoPlayer> monoPlayers = new List<MonoPlayer>();
-        Int32 count = 100000;
+        Int32 count = 65536;
+        BasePlayer[] basePlayers = new BasePlayer[count];
+        MonoPlayer[] monoPlayers = new MonoPlayer[count];
         for(Int32 index = 0; index < count; ++index)
         {
             UInt64 intellect = (UInt64)random.Next(500, 2500);
@@ -27,19 +27,19 @@ internal class Program
             PlayerClassType classType = (PlayerClassType)random.Next(0, (Int32)PlayerClassType.Count);
             switch (classType)
             {
-                case PlayerClassType.Priest:  basePlayers.Add(new PriestPlayer(intellect, spirit)); break;
-                case PlayerClassType.Mage:    basePlayers.Add(new MagePlayer(intellect, spirit)); break;
-                case PlayerClassType.Rogue:   basePlayers.Add(new RoguePlayer(intellect, spirit)); break;
-                case PlayerClassType.Warrior: basePlayers.Add(new WarriorPlayer(intellect, spirit)); break;
+                case PlayerClassType.Priest:  basePlayers[index] = new PriestPlayer(intellect, spirit); break;
+                case PlayerClassType.Mage:    basePlayers[index] = new MagePlayer(intellect, spirit); break;
+                case PlayerClassType.Rogue:   basePlayers[index] = new RoguePlayer(intellect, spirit); break;
+                case PlayerClassType.Warrior: basePlayers[index] = new WarriorPlayer(intellect, spirit); break;
                 default:
                 {
                     Console.WriteLine($"Error: class type {classType} out of range!");
                 } break;
             }
-            monoPlayers.Add(new MonoPlayer(classType, intellect, spirit));
+            monoPlayers[index] = new MonoPlayer(classType, intellect, spirit);
         }
 
-        if(basePlayers.Count != monoPlayers.Count)
+        if(basePlayers.Length != monoPlayers.Length)
         {
             Console.WriteLine($"Error: player count mismatch");
         }
@@ -82,19 +82,22 @@ internal class Program
 
 
 
-        Profiler baseProfiler = new Profiler();
-        Profiler monoProfiler = new Profiler();
-        Int32 ticksToTest = 1000;
+        Profiler baseForEachProfiler = new Profiler();
+        Profiler monoForEachProfiler = new Profiler();
+        Profiler baseForProfiler = new Profiler();
+        Profiler monoForProfiler = new Profiler();
+        Int32 ticksToTest = 100;
         for(;;)
         {
+
             {
-                Console.Write("\n--- BasePlayer ---\n");
+                Console.Write("\n--- BasePlayerForeach ---\n");
 
-                baseProfiler.NewTestWave(0);
+                baseForEachProfiler.NewTestWave(0);
 
-                while(baseProfiler.IsTesting())
+                while(baseForEachProfiler.IsTesting())
                 {
-                    baseProfiler.Begin();
+                    baseForEachProfiler.Begin();
                     for(Int32 index = 0; index < ticksToTest; ++index)
                     {
                         foreach(BasePlayer player in basePlayers)
@@ -106,18 +109,18 @@ internal class Program
                     {
                         player.ClearResource();
                     }
-                    baseProfiler.End();
+                    baseForEachProfiler.End();
                 }
             }
 
             {
-                Console.Write("\n--- MonoPlayer ---\n");
+                Console.Write("\n--- MonoPlayerForeach ---\n");
 
-                monoProfiler.NewTestWave(0);
+                monoForEachProfiler.NewTestWave(0);
 
-                while(monoProfiler.IsTesting())
+                while(monoForEachProfiler.IsTesting())
                 {
-                    monoProfiler.Begin();
+                    monoForEachProfiler.Begin();
                     for(Int32 index = 0; index < ticksToTest; ++index)
                     {
                         foreach(MonoPlayer player in monoPlayers)
@@ -129,9 +132,56 @@ internal class Program
                     {
                         player.ClearResource();
                     }
-                    monoProfiler.End();
+                    monoForEachProfiler.End();
                 }
             }
+
+            {
+                Console.Write("\n--- BasePlayerFor ---\n");
+
+                baseForProfiler.NewTestWave(0);
+
+                while(baseForProfiler.IsTesting())
+                {
+                    baseForProfiler.Begin();
+                    for(Int32 tickIndex = 0; tickIndex < ticksToTest; ++tickIndex)
+                    {
+                        for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
+                        {
+                            basePlayers[playerIndex].ResourceTick();
+                        }
+                    }
+                    for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
+                    {
+                        basePlayers[playerIndex].ClearResource();
+                    }
+                    baseForProfiler.End();
+                }
+            }
+
+            {
+                Console.Write("\n--- MonoPlayerFor ---\n");
+
+                monoForProfiler.NewTestWave(0);
+
+                while(monoForProfiler.IsTesting())
+                {
+                    monoForProfiler.Begin();
+                    for(Int32 tickIndex = 0; tickIndex < ticksToTest; ++tickIndex)
+                    {
+                        for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
+                        {
+                            monoPlayers[playerIndex].ResourceTick();
+                        }
+                    }
+                    for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
+                    {
+                        monoPlayers[playerIndex].ClearResource();
+                    }
+                    monoForProfiler.End();
+                }
+            }
+
         }
     }
 }
