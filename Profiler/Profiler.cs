@@ -75,7 +75,7 @@ public class Profiler
         }
     }
 
-    public void NewTestWave(Int64 targetBytes, Int64 lengthInSeconds = 10)
+    public void NewTestWave(Int64 targetBytes = 0, Int64 lengthInSeconds = 10)
     {
         switch(_state)
         {

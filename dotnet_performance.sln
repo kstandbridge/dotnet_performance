@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiler", "Profiler\Profil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonParsing", "JsonParsing\JsonParsing.csproj", "{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceRegen", "ResourceRegen\ResourceRegen.csproj", "{079D4A1D-D80C-443E-8B73-45E8095D70FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}.Release|Any CPU.Build.0 = Release|Any CPU
+		{079D4A1D-D80C-443E-8B73-45E8095D70FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{079D4A1D-D80C-443E-8B73-45E8095D70FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{079D4A1D-D80C-443E-8B73-45E8095D70FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{079D4A1D-D80C-443E-8B73-45E8095D70FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
