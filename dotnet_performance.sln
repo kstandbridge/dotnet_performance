@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet_performance", "dotnet_performance.csproj", "{0AEA171E-8289-404B-8E52-E28DD4F58445}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Profiler", "Profiler\Profiler.csproj", "{FA12F48E-C2A8-4983-B061-9E41046AB21E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonParsing", "JsonParsing\JsonParsing.csproj", "{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0AEA171E-8289-404B-8E52-E28DD4F58445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0AEA171E-8289-404B-8E52-E28DD4F58445}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0AEA171E-8289-404B-8E52-E28DD4F58445}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0AEA171E-8289-404B-8E52-E28DD4F58445}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA12F48E-C2A8-4983-B061-9E41046AB21E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA12F48E-C2A8-4983-B061-9E41046AB21E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA12F48E-C2A8-4983-B061-9E41046AB21E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA12F48E-C2A8-4983-B061-9E41046AB21E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5A502D9-99A6-4DDF-BAC5-1CC23C2DB355}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
