@@ -19,6 +19,7 @@ public class MonoPlayer
         ClearResource();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public UInt64 MaxResource()
     {
         UInt64 result = 0;

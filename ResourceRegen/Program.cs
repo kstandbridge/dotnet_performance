@@ -10,6 +10,158 @@ public enum PlayerClassType
     Count
 }
 
+public interface IPlayerTest
+{
+    public string Label { get; }
+    public void RunTest();
+}
+
+public class MonoPlayerForeach : IPlayerTest
+{
+    private MonoPlayer[] _monoPlayers;
+    private Int32 _ticksToTest;
+
+    public string Label => "MonoPlayerForeach";
+    private Profiler _profiler;
+
+    public MonoPlayerForeach(MonoPlayer[] monoPlayers, Int32 ticksToTest, Profiler profiler)
+    {
+        _monoPlayers = monoPlayers;
+        _ticksToTest = ticksToTest;
+        _profiler = profiler;
+    }
+    public void RunTest()
+    {
+        _profiler.NewTestWave();
+        while(_profiler.IsTesting())
+        {
+            _profiler.Begin();
+            for(Int32 index = 0; index < _ticksToTest; ++index)
+            {
+                foreach(MonoPlayer player in _monoPlayers)
+                {
+                    player.ResourceTick();
+                }
+            }
+            foreach(MonoPlayer player in _monoPlayers)
+            {
+                player.ClearResource();
+            }
+            _profiler.End();
+        }
+    }
+}
+
+
+public class MonoPlayerFor: IPlayerTest
+{
+    private MonoPlayer[] _monoPlayers;
+    private Int32 _ticksToTest;
+
+    public string Label => "MonoPlayerFor";
+    private Profiler _profiler;
+
+    public MonoPlayerFor(MonoPlayer[] monoPlayers, Int32 ticksToTest, Profiler profiler)
+    {
+        _monoPlayers = monoPlayers;
+        _ticksToTest = ticksToTest;
+        _profiler = profiler;
+    }
+    public void RunTest()
+    {
+        _profiler.NewTestWave();
+        while(_profiler.IsTesting())
+        {
+            _profiler.Begin();
+            for(Int32 tickIndex = 0; tickIndex < _ticksToTest; ++tickIndex)
+            {
+                for(Int32 playerIndex = 0; playerIndex < _monoPlayers.Length; ++playerIndex)
+                {
+                    _monoPlayers[playerIndex].ResourceTick();
+                }
+            }
+            for(Int32 playerIndex = 0; playerIndex < _monoPlayers.Length; ++playerIndex)
+            {
+                _monoPlayers[playerIndex].ClearResource();
+            }
+            _profiler.End();
+        }
+    }
+}
+
+public class BasePlayerForeach : IPlayerTest
+{
+    private BasePlayer[] _basePlayers;
+    private Int32 _ticksToTest;
+
+    public string Label => "BasePlayerForeach";
+    private Profiler _profiler;
+
+    public BasePlayerForeach(BasePlayer[] basePlayers, Int32 ticksToTest, Profiler profiler)
+    {
+        _basePlayers = basePlayers;
+        _ticksToTest = ticksToTest;
+        _profiler = profiler;
+    }
+
+    public void RunTest()
+    {
+        _profiler.NewTestWave();
+        while(_profiler.IsTesting())
+        {
+            _profiler.Begin();
+            for(Int32 index = 0; index < _ticksToTest; ++index)
+            {
+                foreach(BasePlayer player in _basePlayers)
+                {
+                    player.ResourceTick();
+                }
+            }
+            foreach(BasePlayer player in _basePlayers)
+            {
+                player.ClearResource();
+            }
+            _profiler.End();
+        }
+    }
+}
+
+public class BasePlayerFor: IPlayerTest
+{
+    private BasePlayer[] _basePlayers;
+    private Int32 _ticksToTest;
+
+    public string Label => "BasePlayerFor";
+    private Profiler _profiler;
+
+    public BasePlayerFor(BasePlayer[] basePlayers, Int32 ticksToTest, Profiler profiler)
+    {
+        _basePlayers = basePlayers;
+        _ticksToTest = ticksToTest;
+        _profiler = profiler;
+    }
+    public void RunTest()
+    {
+        _profiler.NewTestWave();
+        while(_profiler.IsTesting())
+        {
+            _profiler.Begin();
+            for(Int32 tickIndex = 0; tickIndex < _ticksToTest; ++tickIndex)
+            {
+                for(Int32 playerIndex = 0; playerIndex < _basePlayers.Length; ++playerIndex)
+                {
+                    _basePlayers[playerIndex].ResourceTick();
+                }
+            }
+            for(Int32 playerIndex = 0; playerIndex < _basePlayers.Length; ++playerIndex)
+            {
+                _basePlayers[playerIndex].ClearResource();
+            }
+            _profiler.End();
+        }
+    }
+}
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -80,108 +232,23 @@ internal class Program
             player.ClearResource();
         }
 
+        Int32 ticksToTest = 1000;
+        IPlayerTest[] playerTests = new IPlayerTest[]
+        {
+            new BasePlayerForeach(basePlayers, ticksToTest, new Profiler()),
+            new MonoPlayerForeach(monoPlayers, ticksToTest, new Profiler()),
+            new BasePlayerFor(basePlayers, ticksToTest, new Profiler()),
+            new MonoPlayerFor(monoPlayers, ticksToTest, new Profiler()),
+        };
 
-
-        Profiler baseForEachProfiler = new Profiler();
-        Profiler monoForEachProfiler = new Profiler();
-        Profiler baseForProfiler = new Profiler();
-        Profiler monoForProfiler = new Profiler();
-        Int32 ticksToTest = 100;
         for(;;)
         {
-
+            foreach(IPlayerTest playerTest in playerTests)
             {
-                Console.Write("\n--- BasePlayerForeach ---\n");
-
-                baseForEachProfiler.NewTestWave(0);
-
-                while(baseForEachProfiler.IsTesting())
-                {
-                    baseForEachProfiler.Begin();
-                    for(Int32 index = 0; index < ticksToTest; ++index)
-                    {
-                        foreach(BasePlayer player in basePlayers)
-                        {
-                            player.ResourceTick();
-                        }
-                    }
-                    foreach(BasePlayer player in basePlayers)
-                    {
-                        player.ClearResource();
-                    }
-                    baseForEachProfiler.End();
-                }
+                Console.Write($"\n--- {playerTest.Label} ---\n");
+                playerTest.RunTest();
             }
-
-            {
-                Console.Write("\n--- MonoPlayerForeach ---\n");
-
-                monoForEachProfiler.NewTestWave(0);
-
-                while(monoForEachProfiler.IsTesting())
-                {
-                    monoForEachProfiler.Begin();
-                    for(Int32 index = 0; index < ticksToTest; ++index)
-                    {
-                        foreach(MonoPlayer player in monoPlayers)
-                        {
-                            player.ResourceTick();
-                        }
-                    }
-                    foreach(MonoPlayer player in monoPlayers)
-                    {
-                        player.ClearResource();
-                    }
-                    monoForEachProfiler.End();
-                }
-            }
-
-            {
-                Console.Write("\n--- BasePlayerFor ---\n");
-
-                baseForProfiler.NewTestWave(0);
-
-                while(baseForProfiler.IsTesting())
-                {
-                    baseForProfiler.Begin();
-                    for(Int32 tickIndex = 0; tickIndex < ticksToTest; ++tickIndex)
-                    {
-                        for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
-                        {
-                            basePlayers[playerIndex].ResourceTick();
-                        }
-                    }
-                    for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
-                    {
-                        basePlayers[playerIndex].ClearResource();
-                    }
-                    baseForProfiler.End();
-                }
-            }
-
-            {
-                Console.Write("\n--- MonoPlayerFor ---\n");
-
-                monoForProfiler.NewTestWave(0);
-
-                while(monoForProfiler.IsTesting())
-                {
-                    monoForProfiler.Begin();
-                    for(Int32 tickIndex = 0; tickIndex < ticksToTest; ++tickIndex)
-                    {
-                        for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
-                        {
-                            monoPlayers[playerIndex].ResourceTick();
-                        }
-                    }
-                    for(Int32 playerIndex = 0; playerIndex < count; playerIndex += 4)
-                    {
-                        monoPlayers[playerIndex].ClearResource();
-                    }
-                    monoForProfiler.End();
-                }
-            }
-
         }
+
     }
 }
