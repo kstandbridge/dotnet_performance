@@ -46,7 +46,7 @@ public class DataPlayer
             case PlayerClassType.Rogue:
             case PlayerClassType.Warrior:
             {
-                result = 100;
+                result = UInt64.MaxValue;
             } break;
         }
 
@@ -122,7 +122,7 @@ public class DataPlayer
             } break;
             case PlayerClassType.Warrior:
             {
-                _resource[index] = 100;
+                _resource[index] = UInt64.MaxValue;
             } break;
         }
     }

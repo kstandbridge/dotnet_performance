@@ -52,7 +52,7 @@ public class MagePlayer : BasePlayer
 
 public class RoguePlayer : BasePlayer
 {
-    public override UInt64 MaxResource => 100;
+    public override UInt64 MaxResource => UInt64.MaxValue;
     public RoguePlayer(UInt64 intellect, UInt64 spirit)
     {
         _intellect = intellect;
@@ -101,6 +101,6 @@ public class WarriorPlayer : BasePlayer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void ClearResource()
     {
-        _resource = 100;
+        _resource = UInt64.MaxValue;
     }
 }

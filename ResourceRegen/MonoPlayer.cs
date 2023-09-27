@@ -34,7 +34,7 @@ public class MonoPlayer
             case PlayerClassType.Rogue:
             case PlayerClassType.Warrior:
             {
-                result = 100;
+                result = UInt64.MaxValue;
             } break;
         }
 
@@ -101,7 +101,7 @@ public class MonoPlayer
             } break;
             case PlayerClassType.Warrior:
             {
-                _resource = 100;
+                _resource = UInt64.MaxValue;
             } break;
         }
     }
