@@ -2,6 +2,22 @@ using System.Diagnostics;
 
 namespace DotNetPerformance;
 
+public static class ProfilerExtensions
+{
+    public static Profiler WithTargetBytes(this Profiler profiler, Int64 targetBytes)
+    {
+        profiler._targetBytes = targetBytes;
+        return profiler;
+    }
+
+
+    public static Profiler WithTargetEntities(this Profiler profiler, Int64 targetEntities)
+    {
+        profiler._targetEntities = targetEntities;
+        return profiler;
+    }
+}
+
 public class Profiler
 {
     private enum ProfilerState
@@ -18,6 +34,7 @@ public class Profiler
 
         Ticks,
         Bytes,
+        Entities,
 
         Count,
     }
@@ -44,7 +61,8 @@ public class Profiler
     private Int32 _openBlockCount;
     private Int32 _closeBlockCount;
 
-    private Int64 _targetBytes;
+    public Int64 _targetBytes;
+    public Int64 _targetEntities;
 
     private void Error(string message)
     {
@@ -73,16 +91,21 @@ public class Profiler
             Double bandwidth = (Double)e[(Int32)ProfilerValueType.Bytes] / (gigabyte * seconds);
             Console.Write($" {bandwidth:F2}gb/s");
         }
+
+        if(e[(Int32)ProfilerValueType.Entities] > 0)
+        {
+            Double bandwidth = (Double)e[(Int32)ProfilerValueType.Entities] / (Double)e[(Int32)ProfilerValueType.Ticks];
+            Console.Write($" ({bandwidth:F2} ticks/entity)");
+        }
     }
 
-    public void NewTestWave(Int64 targetBytes = 0, Int64 lengthInSeconds = 10)
+    public void NewTestWave(Int64 lengthInSeconds = 10)
     {
         switch(_state)
         {
             case ProfilerState.Uninitialized:
             {
                 _state = ProfilerState.Testing;
-                _targetBytes = targetBytes;
                 _results.Min.E[(Int32)ProfilerValueType.Ticks] = Int64.MaxValue;
             } break;
             
@@ -115,6 +138,11 @@ public class Profiler
         _currentTest.E[(Int32)ProfilerValueType.Bytes] += bytes;
     }
 
+    public void CountEntities(Int64 entities)
+    {
+        _currentTest.E[(Int32)ProfilerValueType.Entities] += entities;
+    }
+
     public bool IsTesting()
     {
         if(_state == ProfilerState.Testing)
@@ -124,10 +152,17 @@ public class Profiler
                 Error("Unbalanced Begin/End blocks");
             }
 
-            if((_openBlockCount > 0) &&
-              (_currentTest.E[(Int32)ProfilerValueType.Bytes] != _targetBytes))
+            if(_openBlockCount > 0) 
             {
-                Error("Processed byte count mismatch");
+                if(_currentTest.E[(Int32)ProfilerValueType.Bytes] != _targetBytes)
+                {
+                    Error("Processed byte count mismatch");
+                }
+
+                if(_currentTest.E[(Int32)ProfilerValueType.Entities] != _targetEntities)
+                {
+                    Error("Processed entity count mismatch");
+                }
             }
         }
 
