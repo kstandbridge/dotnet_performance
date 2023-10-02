@@ -32,47 +32,30 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        int shapeCount = (int)Math.Pow(2, 24);
+
         Random random = new Random();
 
         Console.WriteLine("");
 
-        int shapeCount = (int)Math.Pow(2, 16);
         bool IsValid = true;
 
         Console.WriteLine($"Generating {shapeCount} shapes...");
         float expectedAreas = 0.0f;
         AbstractShape[] abstractShapes = new AbstractShape[shapeCount];
-        for(int ShapeIndex = 0; ShapeIndex < shapeCount; ++ShapeIndex)
+        StructShape[] structShapes = new StructShape[shapeCount];
+        DataShapes dataShapes = new DataShapes(shapeCount);
+        for(int shapeIndex = 0; shapeIndex < shapeCount; ++shapeIndex)
         {
             ShapeType type = (ShapeType)random.Next(0, (int)ShapeType.Count);
+            float width = random.NextSingle();
+            float height = random.NextSingle();
             switch(type)
             {
-                case ShapeType.Square:
-                {
-                    float sideInit = random.NextSingle();
-                    abstractShapes[ShapeIndex] = new Square(sideInit);
-                } break;
-
-                case ShapeType.Rectangle:
-                {
-                    float widthInit = random.NextSingle();
-                    float heightInit = random.NextSingle();
-                    abstractShapes[ShapeIndex] = new Rectangle(widthInit, heightInit);
-                } break;
-
-                case ShapeType.Triangle:
-                {
-                    float baseInit = random.NextSingle();
-                    float heightInit = random.NextSingle();
-                    abstractShapes[ShapeIndex] = new Triangle(baseInit, heightInit);
-                } break;
-
-                case ShapeType.Circle:
-                {
-                    float radiusInit = random.NextSingle();
-                    abstractShapes[ShapeIndex] = new Circle(radiusInit);
-                } break;
-                
+                case ShapeType.Square:    { abstractShapes[shapeIndex] = new Square(width); } break;
+                case ShapeType.Rectangle: { abstractShapes[shapeIndex] = new Rectangle(width, height); } break;
+                case ShapeType.Triangle:  { abstractShapes[shapeIndex] = new Triangle(width, height); } break;
+                case ShapeType.Circle:    { abstractShapes[shapeIndex] = new Circle(width); } break;
                 case ShapeType.Count:
                 default:
                 {
@@ -80,12 +63,30 @@ internal class Program
                     IsValid = false;
                 } break;
             }
-            expectedAreas += abstractShapes[ShapeIndex].Area();
+            expectedAreas += abstractShapes[shapeIndex].Area();
+
+            structShapes[shapeIndex].type = type;
+            structShapes[shapeIndex].width = width;
+            if ((type == ShapeType.Square) || 
+                (type == ShapeType.Circle))
+            {
+                structShapes[shapeIndex].height = width;
+            }
+            else
+            {
+                structShapes[shapeIndex].height = height;
+            }
+
+            dataShapes.Set(shapeIndex, type, width, height);
         }
 
         ShapeTestProfiler[] testProfilers = new ShapeTestProfiler[]
         {
-            new(new Profiler().WithTargetEntities(shapeCount), new AbstractShapeTest(abstractShapes, shapeCount)),
+            // new(new Profiler().WithTargetEntities(shapeCount), new AbstractShapeTest(abstractShapes, shapeCount)),
+            new(new Profiler().WithTargetEntities(shapeCount), new StructShapeTest(structShapes, shapeCount)),
+            new(new Profiler().WithTargetEntities(shapeCount), new StructShapeTableTest(structShapes, shapeCount)),
+            new(new Profiler().WithTargetEntities(shapeCount), new DataShapeTest(dataShapes, shapeCount)),
+            new(new Profiler().WithTargetEntities(shapeCount), new DataShapeTableTest(dataShapes, shapeCount)),
         };
 
         if(IsValid)
@@ -96,21 +97,22 @@ internal class Program
                 float actualAreas = entry.Test.CalulateAreas();
                 if(expectedAreas != actualAreas)
                 {
-                    Console.WriteLine("ERROR: areas mismatch for AbstractShapes");
+                    Console.WriteLine($"ERROR: areas mismatch for {entry.Test.Label} expected: \"{expectedAreas:F2}\" actual: \"{actualAreas:F2}\"");
                     IsValid = false;
                 }
             }
         }
 
+#if !DEBUG
         if(IsValid)
         {
             Console.WriteLine("Profling...");
-            // for(;;)
+            for(;;)
             {
                 foreach(ShapeTestProfiler entry in testProfilers)
                 {
                     Console.Write($"\n--- {entry.Test.Label} ---\n");
-                    entry.Profiler.NewTestWave(1);
+                    entry.Profiler.NewTestWave(3);
                     while(entry.Profiler.IsTesting())
                     {
                         entry.Profiler.Begin();
@@ -120,8 +122,9 @@ internal class Program
                         entry.Profiler.CountEntities(shapeCount);
                     }
                 }
-            }
+            } 
         }
+#endif
 
         Console.WriteLine("");
     }

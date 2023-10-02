@@ -29,8 +29,8 @@ internal class Program
             foreach(ISomeDataParser parser in parsers)
             {
                 Console.Write($"\n--- {parser.Label} ---\n");
-                Profiler profiler = new Profiler();
-                profiler.NewTestWave(sampleData.Json.Length, 1);
+                Profiler profiler = new Profiler().WithTargetBytes(sampleData.Json.Length);
+                profiler.NewTestWave();
                 while(profiler.IsTesting())
                 {
                     profiler.Begin();

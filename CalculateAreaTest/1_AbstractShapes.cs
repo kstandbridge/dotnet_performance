@@ -1,35 +1,47 @@
 
 public abstract class AbstractShape
 {
-    public abstract float Area();
+    public float Width { get; set; }
+    public float Height { get; set; }
+    public virtual float Area() => Width*Height;
+
+    public AbstractShape(float width, float height)
+    {
+        Width = width;
+        Height = height;
+    }
 }
 
 public class Square : AbstractShape
 {
-    private float _side;
-    public Square(float sideInit) => (_side) = (sideInit);
-    public override float Area() => _side*_side;
+    public Square(float side) : base(side, side)
+    {
+    }
 }
 
 public class Rectangle : AbstractShape
 {
-    private float _width, _height;
-    public Rectangle(float widthInit, float heightInit) => (_width, _height) = (widthInit, heightInit);
-    public override float Area() => _width*_height;
+    public Rectangle(float width, float height) : base(width, height)
+    {
+    }
 }
 
 public class Triangle : AbstractShape
 {
-    private float _base, _height;
-    public Triangle(float baseInit, float heightInit) => (_base, _height) = (baseInit, heightInit);
-    public override float Area() => 0.5f*_base*_height;
+    public Triangle(float width, float height) : base(width, height)
+    {
+    }
+
+    public override float Area() => 0.5f*Width*Height;
 }
 
 public class Circle : AbstractShape
 {
-    private float _radius;
-    public Circle(float radiusInit) => (_radius) = (radiusInit);
-    public override float Area() => (float)Math.PI*_radius*_radius;
+    public Circle(float radius) : base(radius, radius)
+    {
+    }
+
+    public override float Area() => (float)Math.PI*Width*Height;
 }
 
 public class AbstractShapeTest : IShapeTest
