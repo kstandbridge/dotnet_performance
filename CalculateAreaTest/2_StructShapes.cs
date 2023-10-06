@@ -23,9 +23,9 @@ public class StructShapeTest : IShapeTest
     {
         float totalArea = 0.0f;
 
-        for(int ShapeIndex = 0; ShapeIndex < _shapeCount; ++ShapeIndex)
+        for(int index = 0; index < _shapeCount; ++index)
         {
-            StructShape shape = _shapes[ShapeIndex];
+            StructShape shape = _shapes[index];
 
             switch(shape.type)
             {
@@ -40,6 +40,37 @@ public class StructShapeTest : IShapeTest
     }
 }
 
+public class StructShapeNoCopyTest : IShapeTest
+{
+    private StructShape[] _shapes;
+    private int _shapeCount;
+
+    public StructShapeNoCopyTest(StructShape[] shapes, int shapeCount)
+    {
+        _shapes = shapes;
+        _shapeCount = shapeCount;
+    }
+
+    public string Label => "StructShapeNoCopy";
+
+    public float CalulateAreas()
+    {
+        float totalArea = 0.0f;
+
+        for(int index = 0; index < _shapeCount; ++index)
+        {
+            switch(_shapes[index].type)
+            {
+                case ShapeType.Square:      { totalArea += _shapes[index].width*_shapes[index].height; } break;
+                case ShapeType.Rectangle:   { totalArea += _shapes[index].width*_shapes[index].height; } break;
+                case ShapeType.Triangle:    { totalArea += 0.5f * _shapes[index].width*_shapes[index].height; } break;
+                case ShapeType.Circle:      { totalArea += (float)Math.PI*_shapes[index].width*_shapes[index].height; } break;
+            }
+        }
+
+        return totalArea;
+    }
+}
 public class StructShapeTableTest : IShapeTest
 {
     private StructShape[] _shapes;

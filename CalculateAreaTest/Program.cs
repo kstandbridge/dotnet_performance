@@ -82,8 +82,9 @@ internal class Program
 
         ShapeTestProfiler[] testProfilers = new ShapeTestProfiler[]
         {
-            // new(new Profiler().WithTargetEntities(shapeCount), new AbstractShapeTest(abstractShapes, shapeCount)),
+            new(new Profiler().WithTargetEntities(shapeCount), new AbstractShapeTest(abstractShapes, shapeCount)),
             new(new Profiler().WithTargetEntities(shapeCount), new StructShapeTest(structShapes, shapeCount)),
+            new(new Profiler().WithTargetEntities(shapeCount), new StructShapeNoCopyTest(structShapes, shapeCount)),
             new(new Profiler().WithTargetEntities(shapeCount), new StructShapeTableTest(structShapes, shapeCount)),
             new(new Profiler().WithTargetEntities(shapeCount), new DataShapeTest(dataShapes, shapeCount)),
             new(new Profiler().WithTargetEntities(shapeCount), new DataShapeTableTest(dataShapes, shapeCount)),
@@ -112,7 +113,7 @@ internal class Program
                 foreach(ShapeTestProfiler entry in testProfilers)
                 {
                     Console.Write($"\n--- {entry.Test.Label} ---\n");
-                    entry.Profiler.NewTestWave(3);
+                    entry.Profiler.NewTestWave();
                     while(entry.Profiler.IsTesting())
                     {
                         entry.Profiler.Begin();

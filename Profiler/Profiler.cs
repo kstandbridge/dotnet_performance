@@ -94,8 +94,9 @@ public class Profiler
 
         if(e[(Int32)ProfilerValueType.Entities] > 0)
         {
-            Double bandwidth = (Double)e[(Int32)ProfilerValueType.Ticks] / (Double)e[(Int32)ProfilerValueType.Entities];
-            Console.Write($" ({bandwidth:F2} ticks/entity)");
+            Double bandwidth = (Double)e[(Int32)ProfilerValueType.Entities] / seconds / 1000.0d;
+            Console.Write($" ({bandwidth:F0} entities/ms)");
+             
         }
     }
 
